@@ -2,10 +2,11 @@
 /// <reference path="Scripts/typings/underscore/underscore.d.ts" />
 /// <reference path="Scripts/typings/knockout/knockout.d.ts" />
 /// <reference path="Scripts/typings/knockout.es5/knockout.es5.d.ts" />
+/// <reference path="Utility.ts" />
 
 class TaskViewModel {
     public constructor(public name: String = "") {
-        ko.track(this);
+        initViewModel(this);
     }
 
     public clone(): TaskViewModel {
@@ -24,30 +25,30 @@ class TaskListViewModel {
 
     public constructor() {
         this.focus(null);
-        ko.track(this);
+        initViewModel(this);
     }
 
-    public add = () => {
+    public add() {
         if (!this.isEditingTask) { this.tasks.push(this.focusedTask); }
         this.focus(null);
-    };
+    }
 
-    public cancel = () => {
+    public cancel() {
         if (this.isEditingTask) {
             this.focusedTask.copyFrom(this.focusedTaskOriginal);
         }
 
         this.focus(null);
-    };
+    }
 
-    public remove = (task: TaskViewModel) => {
+    public remove(task: TaskViewModel) {
         if (task === this.focusedTask) {
             this.focusedTaskOriginal = null;
         }
         this.tasks.remove(task);
-    };
+    }
 
-    public focus = (task: TaskViewModel) => {
+    public focus(task: TaskViewModel) {
         if (task) {
             this.focusedTask = task;
             this.focusedTaskOriginal = task.clone();
@@ -55,7 +56,7 @@ class TaskListViewModel {
             this.focusedTask = new TaskViewModel();
             this.focusedTaskOriginal = null;
         }
-    };
+    }
 
     public get isEditingTask() {
         return (this.focusedTaskOriginal !== null);
