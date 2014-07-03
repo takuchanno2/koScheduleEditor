@@ -1,0 +1,30 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>ko Schedule Editor</title>
+    <link rel="stylesheet" href="app.css" type="text/css" />
+    <script src="Scripts/jquery-2.1.1.min.js"></script>
+    <script src="Scripts/underscore-min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script src="Scripts/knockout-3.1.0.js"></script>
+    <script src="Scripts/knockout-es5.min.js"></script>
+    <script src="Task.js"></script>
+    <script src="app.js"></script>
+</head>
+<body>
+    <h1>ko Schedule Editor</h1>
+
+  <form data-bind="submit: add">
+    <input data-bind="value: focusedTask.name, valueUpdate: 'afterkeydown'" />
+    <button data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '編集' : '追加')"></button>
+    <button data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel">キャンセル</button>
+  </form>
+
+  <ul data-bind="foreach: tasks">
+    <li data-bind="css: { focused: ($data === $parent.focusedTask) }"><a href="#" data-bind="text: name, click: $parent.focus, clickBubble: false"></a> <button data-bind="click: $parent.remove">削除</button></li>
+  </ul>
+</body>
+</html>
+
