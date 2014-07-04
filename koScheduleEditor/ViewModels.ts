@@ -10,9 +10,8 @@
 
 class BaseViewModel {
     public constructor() {
+        // 定義されている関数内のthisが、イベントコールバック時などでも常に自分のクラスを指すようにする
         var fn = Object.getPrototypeOf(this);
-
-        // thisが常に自分のクラスを指すようにする
         _(Object.getOwnPropertyNames(fn))
             .filter((prop) => (!isAccessor(fn, prop) && _.isFunction(fn[prop])))
             .forEach((prop) => {

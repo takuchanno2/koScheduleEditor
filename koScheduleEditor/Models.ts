@@ -11,7 +11,7 @@ class Task {
     }
 
     public clone(): Task {
-        return _.clone(this);
+        return new Task(this.name, this.timeSpan);
     }
 
     public copyFrom(obj: Task) {
