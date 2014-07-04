@@ -36,6 +36,12 @@ class TaskListViewModel {
         this.clear();
     }
 
+    public duplicate() {
+        var clone = this.focusedTask.clone();
+        this.tasks.push(clone);
+        this.focus(clone);
+    }
+
     public cancel() {
         if (this.isEditingTask) {
             this.focusedTask.copyFrom(this.focusedTaskOriginal);

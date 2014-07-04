@@ -17,35 +17,40 @@
 <body>
   <h1>ko Schedule Editor</h1>
   <form data-bind="submit: add">
-    <table data-bind="click: function() { focus(); }">
-      <thead>
-        <tr>
-          <td>タスク名</td>
-          <td>開始</td>
-          <td>終了</td>
-          <td colspan="2">操作</td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><input data-bind="value: focusedTask.name, valueUpdate: 'input', click: $.noop, clickBubble: false" /></td>
-          <td>ほげ</td>
-          <td>ほげ</td>
-          <td>
-            <button type="submit" data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '変更' : '追加'), click: add, clickBubble: false"></button>
-            <button type="reset" data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel, clickBubble: false">取消</button>
-          </td>
-        </tr>
-        <!-- ko foreach: tasks -->
-        <tr class="task" data-bind="css: { focused: ($data == $parent.focusedTask) }, click: $parent.focus, clickBubble: false">
-          <td class="task-name"><a href="#" data-bind="text: name, clickBubble: false"></a></td>
-          <td>ほげ</td>
-          <td>ほげ</td>
-          <td colspan="2"><button type="button" data-bind="click: $parent.remove, clickBubble: false">削除</button></td>
-        </tr>
-        <!-- /ko -->
-      </tbody>
+    <table>
+      <tr>
+        <td><input data-bind="value: focusedTask.name, valueUpdate: 'input', click: $.noop" /></td>
+        <td>ほげ</td>
+        <td>ほげ</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <button type="button" data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '変更' : '追加'), click: add"></button>
+          <button type="button" data-bind="enable: (focusedTask.name.length > 0), click: duplicate">複製</button>
+          <button type="button" data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel">取消</button>
+        </td>
+      </tr>
     </table>
   </form>
+
+  <table>
+    <thead>
+      <tr>
+        <td>タスク名</td>
+        <td>開始</td>
+        <td>終了</td>
+        <td></td>
+      </tr>
+    </thead>
+    <tbody data-bind="foreach: tasks">
+      <tr class="task" data-bind="css: { focused: ($data == $parent.focusedTask) }, click: $parent.focus">
+        <td class="task-name"><a href="#" data-bind="text: name"></a></td>
+        <td>ほげ</td>
+        <td>ほげ</td>
+        <td><button type="button" data-bind="click: $parent.remove">削除</button></td>
+      </tr>
+    </tbody>
+  </table>
 </body>
 </html>
