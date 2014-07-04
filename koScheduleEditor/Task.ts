@@ -4,6 +4,10 @@
 /// <reference path="Scripts/typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="Utility.ts" />
 
+class Time {
+    
+}
+
 class TaskViewModel {
     public constructor(public name: String = "") {
         initViewModel(this);
