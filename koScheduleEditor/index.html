@@ -11,6 +11,7 @@
   <script src="Scripts/knockout-es5.min.js"></script>
   <script src="Utilities.js"></script>
   <script src="BaseTypes.js"></script>
+  <script src="Models.js"></script>
   <script src="ViewModels.js"></script>
   <script src="app.js"></script>
 </head>
@@ -29,6 +30,7 @@
           <button type="button" data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '変更' : '追加'), click: add"></button>
           <button type="button" data-bind="enable: (focusedTask.name.length > 0), click: duplicate">複製</button>
           <button type="button" data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel">取消</button>
+          <span data-bind="text: focusedTask.name.length"></span>
         </td>
       </tr>
     </table>

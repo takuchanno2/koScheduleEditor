@@ -3,15 +3,18 @@
 /// <reference path="Scripts/typings/knockout/knockout.d.ts" />
 /// <reference path="Scripts/typings/knockout.es5/knockout.es5.d.ts" />
 /// <reference path="BaseTypes.ts" />
+/// <reference path="Models.ts" />
 /// <reference path="Utilities.ts" />
 
 "use strict";
 
 class BaseViewModel {
     public constructor() {
+        var fn = Object.getPrototypeOf(this);
+
         // thisが常に自分のクラスを指すようにする
-        _(Object.getOwnPropertyNames(Object.getPrototypeOf(this)))
-            .filter((prop) => _.isFunction(this[prop]))
+        _(Object.getOwnPropertyNames(fn))
+            .filter((prop) => (!isAccessor(fn, prop) && _.isFunction(fn[prop])))
             .forEach((prop) => {
                 this[prop] = this[prop].bind(this);
             });
@@ -19,17 +22,23 @@ class BaseViewModel {
 }
 
 class TaskViewModel extends BaseViewModel{
-    public constructor(public name = "", public begin = TimeSpan.coretime.begin, public end = TimeSpan.coretime.end) {
+    public constructor(private model: Task = new Task()) {
         super();
         ko.track(this);
     }
 
+    public get name() { return this.model.name; }
+    public set name(value: string) { this.model.name = value; }
+
+    public get timeSpan() { return this.model.timeSpan; }
+    public set timeSpan(value: TimeSpan) { this.model.timeSpan = value;  }
+
     public clone(): TaskViewModel {
-        return new TaskViewModel(this.name);
+        return new TaskViewModel(this.model.clone());
     }
 
     public copyFrom(task: TaskViewModel) {
-        this.name = task.name;
+        this.model.copyFrom(task.model);
     }
 }
 
