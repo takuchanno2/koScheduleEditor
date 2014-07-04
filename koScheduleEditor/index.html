@@ -20,7 +20,7 @@
   <form data-bind="submit: add">
     <table>
       <tr>
-        <td><input data-bind="value: focusedTask.name, valueUpdate: 'input', click: $.noop" /></td>
+        <td><input data-bind="value: focusedTask.name, valueUpdate: 'afterkeydown', hasfocus: isTextBoxFocused, click: $.noop" /></td>
         <td>ほげ</td>
         <td>ほげ</td>
         <td></td>

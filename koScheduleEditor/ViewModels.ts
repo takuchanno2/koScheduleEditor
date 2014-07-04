@@ -43,8 +43,10 @@ class TaskViewModel extends BaseViewModel{
 
 class TaskListViewModel extends BaseViewModel{
     public tasks: TaskViewModel[] = [];
+
     private focusedTask: TaskViewModel;
     private focusedTaskOriginal: TaskViewModel;
+    private isTextBoxFocused = false;
 
     public constructor() {
         super();
@@ -55,12 +57,14 @@ class TaskListViewModel extends BaseViewModel{
     public add() {
         if (!this.isEditingTask) { this.tasks.push(this.focusedTask); }
         this.clear();
+        this.isTextBoxFocused = true;
     }
 
     public duplicate() {
         var clone = this.focusedTask.clone();
         this.tasks.push(clone);
         this.focus(clone);
+        this.isTextBoxFocused = true;
     }
 
     public cancel() {
@@ -70,11 +74,14 @@ class TaskListViewModel extends BaseViewModel{
         } else {
             this.clear();
         }
+
+        this.isTextBoxFocused = true;
     }
 
     public clear() {
         this.focusedTask = new TaskViewModel();
         this.focusedTaskOriginal = null;
+        this.isTextBoxFocused = true;
     }
 
     public remove(task: TaskViewModel) {
@@ -83,6 +90,7 @@ class TaskListViewModel extends BaseViewModel{
         }
 
         this.tasks.remove(task);
+       this.isTextBoxFocused = true;
     }
 
     public focus(task: TaskViewModel) {
@@ -96,6 +104,8 @@ class TaskListViewModel extends BaseViewModel{
                 this.clear();
             }
         }
+
+        this.isTextBoxFocused = true;
     }
 
     public get isEditingTask() {
