@@ -7,9 +7,21 @@
 
 "use strict";
 
-class TaskViewModel {
+class BaseViewModel {
+    public constructor() {
+        // thisが常に自分のクラスを指すようにする
+        _(Object.getOwnPropertyNames(Object.getPrototypeOf(this)))
+            .filter((prop) => _.isFunction(this[prop]))
+            .forEach((prop) => {
+                this[prop] = this[prop].bind(this);
+            });
+    }
+}
+
+class TaskViewModel extends BaseViewModel{
     public constructor(public name = "", public begin = TimeSpan.coretime.begin, public end = TimeSpan.coretime.end) {
-        initViewModel(this);
+        super();
+        ko.track(this);
     }
 
     public clone(): TaskViewModel {
@@ -21,14 +33,15 @@ class TaskViewModel {
     }
 }
 
-class TaskListViewModel {
+class TaskListViewModel extends BaseViewModel{
     public tasks: TaskViewModel[] = [];
     private focusedTask: TaskViewModel;
     private focusedTaskOriginal: TaskViewModel;
 
     public constructor() {
+        super();
         this.clear();
-        initViewModel(this);
+        ko.track(this);
     }
 
     public add() {
@@ -80,15 +93,4 @@ class TaskListViewModel {
     public get isEditingTask() {
         return (this.focusedTaskOriginal !== null);
     }
-}
-
-function initViewModel(viewModel: any) {
-    // thisが常に自分のクラスを指すようにする
-    _(Object.getOwnPropertyNames(Object.getPrototypeOf(viewModel)))
-        .filter((prop) => _.isFunction(viewModel[prop]))
-        .forEach((prop) => {
-            viewModel[prop] = viewModel[prop].bind(viewModel);
-        });
-
-    ko.track(viewModel);
 }
