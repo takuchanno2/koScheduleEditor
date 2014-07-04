@@ -58,8 +58,9 @@ class TaskListViewModel {
 
     public remove(task: TaskViewModel) {
         if (task === this.focusedTask) {
-            this.focusedTaskOriginal = null;
+            this.clear();
         }
+
         this.tasks.remove(task);
     }
 
