@@ -1,53 +1,51 @@
 ﻿<!DOCTYPE html>
-
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>ko Schedule Editor</title>
-    <link rel="stylesheet" href="app.css" type="text/css" />
-    <script src="Scripts/jquery-2.1.1.min.js"></script>
-    <script src="Scripts/underscore-min.js"></script>
-    <script src="Scripts/bootstrap.min.js"></script>
-    <script src="Scripts/knockout-3.1.0.js"></script>
-    <script src="Scripts/knockout-es5.min.js"></script>
-    <script src="Utility.js"></script>
-    <script src="Task.js"></script>
-    <script src="app.js"></script>
+  <meta charset="utf-8" />
+  <title>ko Schedule Editor</title>
+  <link rel="stylesheet" href="app.css" type="text/css" />
+  <script src="Scripts/jquery-2.1.1.min.js"></script>
+  <script src="Scripts/underscore-min.js"></script>
+  <script src="Scripts/bootstrap.min.js"></script>
+  <script src="Scripts/knockout-3.1.0.debug.js"></script>
+  <script src="Scripts/knockout-es5.min.js"></script>
+  <script src="Utilities.js"></script>
+  <script src="BaseTypes.js"></script>
+  <script src="ViewModels.js"></script>
+  <script src="app.js"></script>
 </head>
 <body>
-    <h1>ko Schedule Editor</h1>
-
-    <form data-bind="submit: add">
-
-        <table>
-            <thead>
-                <tr>
-                    <td>タスク名</td>
-                    <td>操作</td>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td><input data-bind="value: focusedTask.name, valueUpdate: 'afterkeydown'" /></td>
-                    <td>
-                        <button data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '変更' : '追加')"></button>
-                        <button data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel">取消</button>
-                    </td>
-                </tr>
-                <!-- ko foreach: tasks -->
-                <tr data-bind="css: { focused: ($data == $parent.focusedTask) }">
-                    <td><a href="#" class="task-title" data-bind="text: name, click: $parent.focus, clickBubble: false"></a></td>
-                    <td><button data-bind="click: $parent.remove">削除</button></td>
-                </tr>
-                <!-- /ko -->
-            </tbody>
-        </table>
-    </form>
-
-
-  <ul data-bind="foreach: tasks">
-    <li data-bind=> </li>
-  </ul>
+  <h1>ko Schedule Editor</h1>
+  <form data-bind="submit: add">
+    <table data-bind="click: function() { focus(); }">
+      <thead>
+        <tr>
+          <td>タスク名</td>
+          <td>開始</td>
+          <td>終了</td>
+          <td colspan="2">操作</td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><input data-bind="value: focusedTask.name, valueUpdate: 'input', click: $.noop, clickBubble: false" /></td>
+          <td>ほげ</td>
+          <td>ほげ</td>
+          <td>
+            <button type="submit" data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '変更' : '追加'), click: add, clickBubble: false"></button>
+            <button type="reset" data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel, clickBubble: false">取消</button>
+          </td>
+        </tr>
+        <!-- ko foreach: tasks -->
+        <tr class="task" data-bind="css: { focused: ($data == $parent.focusedTask) }, click: $parent.focus, clickBubble: false">
+          <td class="task-name"><a href="#" data-bind="text: name, clickBubble: false"></a></td>
+          <td>ほげ</td>
+          <td>ほげ</td>
+          <td colspan="2"><button type="button" data-bind="click: $parent.remove, clickBubble: false">削除</button></td>
+        </tr>
+        <!-- /ko -->
+      </tbody>
+    </table>
+  </form>
 </body>
 </html>
-

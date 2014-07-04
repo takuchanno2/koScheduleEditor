@@ -52,12 +52,13 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="app.ts" />
+    <TypeScriptCompile Include="BaseTypes.ts" />
     <TypeScriptCompile Include="Scripts\typings\underscore\underscore.d.ts" />
-    <TypeScriptCompile Include="Task.ts" />
+    <TypeScriptCompile Include="Utilities.ts" />
+    <TypeScriptCompile Include="ViewModels.ts" />
     <TypeScriptCompile Include="Scripts\typings\jquery\jquery.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout.es5\knockout.es5.d.ts" />
     <TypeScriptCompile Include="Scripts\typings\knockout\knockout.d.ts" />
-    <TypeScriptCompile Include="Utility.ts" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Scripts\underscore-min.map" />

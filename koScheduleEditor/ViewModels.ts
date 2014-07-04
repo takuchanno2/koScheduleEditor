@@ -2,14 +2,13 @@
 /// <reference path="Scripts/typings/underscore/underscore.d.ts" />
 /// <reference path="Scripts/typings/knockout/knockout.d.ts" />
 /// <reference path="Scripts/typings/knockout.es5/knockout.es5.d.ts" />
-/// <reference path="Utility.ts" />
+/// <reference path="BaseTypes.ts" />
+/// <reference path="Utilities.ts" />
 
-class Time {
-    
-}
+"use strict";
 
 class TaskViewModel {
-    public constructor(public name: String = "") {
+    public constructor(public name = "", public begin = TimeSpan.coretime.begin, public end = TimeSpan.coretime.end) {
         initViewModel(this);
     }
 
@@ -24,25 +23,31 @@ class TaskViewModel {
 
 class TaskListViewModel {
     public tasks: TaskViewModel[] = [];
-    private focusedTask = new TaskViewModel();
-    public focusedTaskOriginal: TaskViewModel = null;
+    private focusedTask: TaskViewModel;
+    private focusedTaskOriginal: TaskViewModel;
 
     public constructor() {
-        this.focus(null);
+        this.clear();
         initViewModel(this);
     }
 
     public add() {
         if (!this.isEditingTask) { this.tasks.push(this.focusedTask); }
-        this.focus(null);
+        this.clear();
     }
 
     public cancel() {
         if (this.isEditingTask) {
             this.focusedTask.copyFrom(this.focusedTaskOriginal);
+            this.focus(null);
+        } else {
+            this.clear();
         }
+    }
 
-        this.focus(null);
+    public clear() {
+        this.focusedTask = new TaskViewModel();
+        this.focusedTaskOriginal = null;
     }
 
     public remove(task: TaskViewModel) {
@@ -54,15 +59,29 @@ class TaskListViewModel {
 
     public focus(task: TaskViewModel) {
         if (task) {
-            this.focusedTask = task;
-            this.focusedTaskOriginal = task.clone();
+            if (task !== this.focusedTask) {
+                this.focusedTask = task;
+                this.focusedTaskOriginal = task.clone();
+            }
         } else {
-            this.focusedTask = new TaskViewModel();
-            this.focusedTaskOriginal = null;
+            if (this.isEditingTask) {
+                this.clear();
+            }
         }
     }
 
     public get isEditingTask() {
         return (this.focusedTaskOriginal !== null);
     }
+}
+
+function initViewModel(viewModel: any) {
+    // thisが常に自分のクラスを指すようにする
+    _(Object.getOwnPropertyNames(Object.getPrototypeOf(viewModel)))
+        .filter((prop) => _.isFunction(viewModel[prop]))
+        .forEach((prop) => {
+            viewModel[prop] = viewModel[prop].bind(viewModel);
+        });
+
+    ko.track(viewModel);
 }
