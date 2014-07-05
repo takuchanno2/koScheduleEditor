@@ -21,5 +21,18 @@ class Task {
 }
 
 class TaskCollection {
-    public tasks: Task[] = [];
+    private tasks: Task[] = [];
+
+    public constructor() {
+        ko.track(this);
+    }
+
+    public add(task: Task) {
+        this.tasks.push(task);
+    }
+
+    public remove(task: Task) {
+        this.tasks.remove(task);
+    }
+  
 }

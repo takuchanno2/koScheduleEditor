@@ -21,36 +21,61 @@ class BaseViewModel {
 }
 
 class TaskListViewModel extends BaseViewModel{
-    public tasks: Task[] = [];
+    public tasks: TaskCollection = new TaskCollection();
 
     private focusedTask: Task = null;
     private focusedTaskOriginal: Task = null;
     private isTextBoxFocused = false;
 
     private timeOptions: Time[] = [];
+    private intialTimeSpanOption: Time = null;
+
     private timeSpanBegin: Time = null;
     private timeSpanEnd: Time = null;
+    private timeSpanSubscriptions: KnockoutSubscription[] = [];
 
     public constructor() {
         super();
-        this.clear();
 
         for (var i = 0; i <= 24 * 60; i += Time.unitMinutes) {
-            this.timeOptions.push(new Time(i));
+            var time = new Time(i);
+            if (!this.intialTimeSpanOption && TimeSpan.coretime.includes(time)) {
+                this.intialTimeSpanOption = time;
+            }
+            this.timeOptions.push(time);
         }
 
+        this.clear();
+
         ko.track(this);
+        this.onTimeSpanChanged();
+        this.registerTimeSpanSubscriptions();
+        
+    }
+
+    private registerTimeSpanSubscriptions() {
+        ["timeSpanBegin", "timeSpanEnd"].forEach((prop) => {
+            this.timeSpanSubscriptions.push(ko.getObservable(this, prop).subscribe(this.onTimeSpanChanged));
+        });
+    }
+
+    private unregisterTimeSpanSubscriptions() {
+        this.timeSpanSubscriptions.forEach((s) => {
+            s.dispose();
+        });
+
+        this.timeSpanSubscriptions = [];
     }
 
     public add() {
-        if (!this.isEditingTask) { this.tasks.push(this.focusedTask); }
+        if (!this.isEditingTask) { this.tasks.add(this.focusedTask); }
         this.clear();
         this.isTextBoxFocused = true;
     }
 
     public duplicate() {
         var clone = this.focusedTask.clone();
-        this.tasks.push(clone);
+        this.tasks.add(clone);
         this.focus(clone);
         this.isTextBoxFocused = true;
     }
@@ -69,8 +94,8 @@ class TaskListViewModel extends BaseViewModel{
     public clear() {
         this.focusedTask = new Task();
         this.focusedTaskOriginal = null;
-        this.timeSpanBegin = this.timeOptions[0];
-        this.timeSpanEnd = this.timeOptions[0];
+        this.timeSpanBegin = this.intialTimeSpanOption;
+        this.timeSpanEnd = this.intialTimeSpanOption;
 
         this.isTextBoxFocused = true;
     }
@@ -89,6 +114,11 @@ class TaskListViewModel extends BaseViewModel{
             if (task !== this.focusedTask) {
                 this.focusedTask = task;
                 this.focusedTaskOriginal = task.clone();
+
+                this.unregisterTimeSpanSubscriptions();
+                this.timeSpanBegin = task.timeSpan.begin;
+                this.timeSpanEnd = task.timeSpan.end;
+                this.registerTimeSpanSubscriptions();
             }
         } else {
             if (this.isEditingTask) {
@@ -101,6 +131,16 @@ class TaskListViewModel extends BaseViewModel{
 
     private colorCoretimeOptions(option: Element, item: Time) {
         ko.applyBindingsToNode(option, { "css": (TimeSpan.coretime.includes(item) ? "coretime" : "") }, item);
+    }
+
+    private onTimeSpanChanged() {
+        if (this.timeSpanBegin && this.timeSpanEnd) {
+            if (this.timeSpanBegin.totalMinutes <= this.timeSpanEnd.totalMinutes) {
+                this.focusedTask.timeSpan = new TimeSpan(this.timeSpanBegin, this.timeSpanEnd);
+            } else {
+                this.focusedTask.timeSpan = new TimeSpan(this.timeSpanEnd, this.timeSpanBegin);
+            }
+        }
     }
 
     public get isEditingTask() {
