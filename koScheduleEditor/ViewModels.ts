@@ -52,11 +52,12 @@ class TaskViewModel extends BaseViewModel {
     }
 }
 
-class TaskCollectionViewModel extends BaseViewModel {
-    public tasks: TaskCollection = new TaskCollection();
 
-    private focusedTask: Task = null;
-    private focusedTaskOriginal: Task = null;
+class TaskListViewModel extends BaseViewModel {
+    public tasks: TaskViewModel[] = [];
+
+    private focusedTask: TaskViewModel = null;
+    private focusedTaskOriginal: TaskViewModel = null;
     private isTextBoxFocused = false;
 
     private timeOptions: Time[] = [];
@@ -89,22 +90,34 @@ class TaskCollectionViewModel extends BaseViewModel {
     }
 
     public add() {
-        if (!this.isEditingTask) { this.tasks.add(this.focusedTask); }
+        if (!this.isEditingTask) {
+            this.addNewTaskViewModel(this.focusedTask);
+        }
         this.clear();
         this.isTextBoxFocused = true;
     }
 
     public duplicate() {
         var clone = this.focusedTask.clone();
-        this.tasks.add(clone);
+        this.addNewTaskViewModel(clone);
         this.focus(clone);
         this.isTextBoxFocused = true;
+    }
+
+    private addNewTaskViewModel(taskvm: TaskViewModel) {
+        if (_.isEmpty(this.tasks)) {
+            this.tasks.push(taskvm);
+        } else {
+            var idx = _(this.tasks).sortedIndex(taskvm, TaskViewModel.iterator);
+            this.tasks.splice(idx, 0, taskvm);
+            this.validateTask();
+        }
     }
 
     public cancel() {
         if (this.isEditingTask) {
             this.focusedTask.copyFrom(this.focusedTaskOriginal);
-            this.tasks.updateIndex(this.focusedTask);
+            this.updateIndex(this.focusedTask);
             this.focus(null);
         } else {
             this.clear();
@@ -114,7 +127,7 @@ class TaskCollectionViewModel extends BaseViewModel {
     }
 
     public clear() {
-        this.focusedTask = new Task();
+        this.focusedTask = new TaskViewModel(new Task());
         this.focusedTaskOriginal = null;
         this.timeSpanBegin = this.intialTimeSpanOption;
         this.timeSpanEnd = this.intialTimeSpanOption;
@@ -122,22 +135,23 @@ class TaskCollectionViewModel extends BaseViewModel {
         this.isTextBoxFocused = true;
     }
 
-    public remove(task: Task) {
-        if (task === this.focusedTask) {
+    public remove(taskvm: TaskViewModel) {
+        if (taskvm === this.focusedTask) {
             this.clear();
         }
 
-        this.tasks.remove(task);
+        this.tasks.remove(taskvm);
+        this.validateTask();
         this.isTextBoxFocused = true;
     }
 
-    public focus(task: Task) {
-        if (task) {
-            if (task !== this.focusedTask) {
-                this.focusedTask = task;
-                this.focusedTaskOriginal = task.clone();
-                this.timeSpanBegin = task.timeSpan.begin;
-                this.timeSpanEnd = task.timeSpan.end;
+    public focus(taskvm: TaskViewModel) {
+        if (taskvm) {
+            if (taskvm !== this.focusedTask) {
+                this.focusedTask = taskvm;
+                this.focusedTaskOriginal = taskvm.clone();
+                this.timeSpanBegin = taskvm.timeSpan.begin;
+                this.timeSpanEnd = taskvm.timeSpan.end;
             }
         } else {
             if (this.isEditingTask) {
@@ -171,8 +185,36 @@ class TaskCollectionViewModel extends BaseViewModel {
         if (!TimeSpan.equals(this.focusedTask.timeSpan, newTimeSpan)) {
             this.focusedTask.timeSpan = newTimeSpan;
             if (this.isEditingTask) {
-                this.tasks.updateIndex(this.focusedTask);
+                this.updateIndex(this.focusedTask);
             }
+        }
+    }
+
+    // もう少しどうにかできないか
+    private validateTask() {
+        if (!_.isEmpty(this.tasks)) {
+            this.tasks[0].hasTimeSpanOverlap = false;
+        }
+
+        for (var i = 1; i < this.tasks.length; i++) {
+            var prev = this.tasks[i - 1];
+            var curr = this.tasks[i];
+            if (prev.timeSpan.hasOverlap(curr.timeSpan)) {
+                prev.hasTimeSpanOverlap = true;
+                curr.hasTimeSpanOverlap = true;
+            } else {
+                curr.hasTimeSpanOverlap = false;
+            }
+        }
+    }
+
+
+    private updateIndex(taskvm: TaskViewModel) {
+        if (this.tasks.length > 1) {
+            this.tasks.remove(taskvm);
+            var idx = _(this.tasks).sortedIndex(taskvm, TaskViewModel.iterator);
+            this.tasks.splice(idx, 0, taskvm);
+            this.validateTask();
         }
     }
 

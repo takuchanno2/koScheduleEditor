@@ -3,5 +3,5 @@
 /// <reference path="Scripts/typings/knockout.es5/knockout.es5.d.ts" />
 
 $(() => {
-    ko.applyBindings(new TaskCollectionViewModel());
+    ko.applyBindings(new TaskListViewModel());
 });
