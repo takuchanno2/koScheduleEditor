@@ -45,12 +45,17 @@ class TaskListViewModel extends BaseViewModel{
             this.timeOptions.push(time);
         }
 
+        ko.track(this);
         this.clear();
 
-        ko.track(this);
         this.onTimeSpanChanged();
         this.registerTimeSpanSubscriptions();
-        
+    }
+
+    private modifyTimeSpanSneakily(func: () => void) {
+        this.unregisterTimeSpanSubscriptions();
+        func();
+        this.registerTimeSpanSubscriptions();
     }
 
     private registerTimeSpanSubscriptions() {
@@ -94,8 +99,10 @@ class TaskListViewModel extends BaseViewModel{
     public clear() {
         this.focusedTask = new Task();
         this.focusedTaskOriginal = null;
-        this.timeSpanBegin = this.intialTimeSpanOption;
-        this.timeSpanEnd = this.intialTimeSpanOption;
+        this.modifyTimeSpanSneakily(() => {
+            this.timeSpanBegin = this.intialTimeSpanOption;
+            this.timeSpanEnd = this.intialTimeSpanOption;
+        });
 
         this.isTextBoxFocused = true;
     }
@@ -115,10 +122,10 @@ class TaskListViewModel extends BaseViewModel{
                 this.focusedTask = task;
                 this.focusedTaskOriginal = task.clone();
 
-                this.unregisterTimeSpanSubscriptions();
-                this.timeSpanBegin = task.timeSpan.begin;
-                this.timeSpanEnd = task.timeSpan.end;
-                this.registerTimeSpanSubscriptions();
+                this.modifyTimeSpanSneakily(() => {
+                    this.timeSpanBegin = task.timeSpan.begin;
+                    this.timeSpanEnd = task.timeSpan.end;
+                });
             }
         } else {
             if (this.isEditingTask) {
@@ -139,6 +146,13 @@ class TaskListViewModel extends BaseViewModel{
                 this.focusedTask.timeSpan = new TimeSpan(this.timeSpanBegin, this.timeSpanEnd);
             } else {
                 this.focusedTask.timeSpan = new TimeSpan(this.timeSpanEnd, this.timeSpanBegin);
+                _.defer(() => {
+                    this.modifyTimeSpanSneakily(() => {
+                        var begin = this.timeSpanBegin;
+                        this.timeSpanBegin = this.timeSpanEnd;
+                        this.timeSpanEnd = begin;
+                    });
+                });
             }
         }
     }
