@@ -56,6 +56,7 @@ class TaskListViewModel extends BaseViewModel{
         this.unregisterTimeSpanSubscriptions();
         func();
         this.registerTimeSpanSubscriptions();
+        this.onTimeSpanChanged();
     }
 
     private registerTimeSpanSubscriptions() {
