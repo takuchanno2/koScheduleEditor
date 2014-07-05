@@ -10,6 +10,10 @@ class Task {
         ko.track(this);
     }
 
+    public get isValid() {
+        return this.timeSpan.span.totalMinutes > 0;
+    }
+
     public clone(): Task {
         return new Task(this.name, this.timeSpan);
     }

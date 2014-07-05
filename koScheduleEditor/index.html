@@ -45,7 +45,7 @@
       </tr>
     </thead>
     <tbody data-bind="foreach: tasks.tasks">
-      <tr class="task" data-bind="css: { focused: ($data == $parent.focusedTask) }, click: $parent.focus">
+      <tr class="task" data-bind="css: { invalid: !isValid, focused: ($data == $parent.focusedTask) }, click: $parent.focus">
         <td class="task-name"><a href="#" data-bind="text: name"></a></td>
         <td data-bind="text: timeSpan.begin"></td>
         <td data-bind="text: timeSpan.end"></td>

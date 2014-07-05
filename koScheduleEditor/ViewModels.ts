@@ -48,8 +48,12 @@ class TaskCollectionViewModel extends BaseViewModel{
         this.updateTaskTimeSpan();
 
         ko.track(this);
-        ko.getObservable(this, "timeSpanBegin").subscribe(this.onTimeSpanBeginChanged);
-        ko.getObservable(this, "timeSpanEnd").subscribe(this.onTimeSpanEndChanged);
+        ko.getObservable(this, "timeSpanBegin")
+            .extend({ "rateLimit": 0 })
+            .subscribe(this.onTimeSpanBeginChanged);
+        ko.getObservable(this, "timeSpanEnd")
+            .extend({ "rateLimit": 0 })
+            .subscribe(this.onTimeSpanEndChanged);
     }
 
     public add() {
