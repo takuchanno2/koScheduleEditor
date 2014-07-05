@@ -89,6 +89,7 @@ class TaskListViewModel extends BaseViewModel{
     public cancel() {
         if (this.isEditingTask) {
             this.focusedTask.copyFrom(this.focusedTaskOriginal);
+            this.tasks.updateIndex(this.focusedTask);
             this.focus(null);
         } else {
             this.clear();
@@ -142,19 +143,24 @@ class TaskListViewModel extends BaseViewModel{
     }
 
     private onTimeSpanChanged() {
-        if (this.timeSpanBegin && this.timeSpanEnd) {
-            if (this.timeSpanBegin.totalMinutes <= this.timeSpanEnd.totalMinutes) {
-                this.focusedTask.timeSpan = new TimeSpan(this.timeSpanBegin, this.timeSpanEnd);
-            } else {
-                this.focusedTask.timeSpan = new TimeSpan(this.timeSpanEnd, this.timeSpanBegin);
-                _.defer(() => {
-                    this.modifyTimeSpanSneakily(() => {
-                        var begin = this.timeSpanBegin;
-                        this.timeSpanBegin = this.timeSpanEnd;
-                        this.timeSpanEnd = begin;
-                    });
-                });
+        if (!this.timeSpanBegin || !this.timeSpanEnd) return;
+
+        if (this.timeSpanBegin.totalMinutes <= this.timeSpanEnd.totalMinutes) {
+            var newTimeSpan = new TimeSpan(this.timeSpanBegin, this.timeSpanEnd);
+            if (!TimeSpan.equals(this.focusedTask.timeSpan, newTimeSpan)) {
+                this.focusedTask.timeSpan = newTimeSpan;
+                if (this.isEditingTask) {
+                    this.tasks.updateIndex(this.focusedTask);
+                }
             }
+        } else {
+            _.defer(() => {
+                this.modifyTimeSpanSneakily(() => {
+                    var begin = this.timeSpanBegin;
+                    this.timeSpanBegin = this.timeSpanEnd;
+                    this.timeSpanEnd = begin;
+                });
+            });
         }
     }
 

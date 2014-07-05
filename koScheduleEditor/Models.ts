@@ -21,18 +21,34 @@ class Task {
 }
 
 class TaskCollection {
-    private tasks: Task[] = [];
+    public tasks: Task[] = [];
 
     public constructor() {
         ko.track(this);
     }
 
     public add(task: Task) {
-        this.tasks.push(task);
+        if (_.isEmpty(this.tasks)) {
+            this.tasks.push(task);
+        } else {
+            var idx = _(this.tasks).sortedIndex(task, this.taskIterator);
+            this.tasks.splice(idx, 0, task);
+        }
     }
 
     public remove(task: Task) {
         this.tasks.remove(task);
     }
-  
+
+    public updateIndex(task: Task) {
+        if (this.tasks.length > 1) {
+            this.tasks.remove(task);
+            var idx = _(this.tasks).sortedIndex(task, this.taskIterator);
+            this.tasks.splice(idx, 0, task);
+        }
+    }
+
+    private taskIterator(task: Task) {
+        return task.timeSpan.begin.totalMinutes * 24 * 60 + task.timeSpan.end.totalMinutes;
+    }
 }
