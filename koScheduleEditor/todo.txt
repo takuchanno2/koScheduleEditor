@@ -5,7 +5,7 @@
 ・タスク追加時に時間の重複があったら警告表示
 ・入力欄のテキストボックスやボタン以外をクリックした時でも、選択解除されるように
 ・何かタスクを追加しようとすると、リアルタイムで表に現れるように
-・ModelとViewModelの分離
+・ModelとViewModelの分離 (TaskCollection/TaskList的な奴をモデルに)
 ・ViewModelのコンストラクタにModelを渡す、渡されたモデルのプロパティを列挙して、ViewModelのプロパティからModelのプロパティを直接弄れるようにする
 
 ・underscore.deferでko.trackをbaseviewmodelのconstructorで処理できるようにする
