@@ -27,21 +27,23 @@ class Time {
         Object.freeze(this);
     }
 
-    public get hours(): number { return Math.floor(this.totalMinutes / 60); }
-    public get minutes(): number { return this.totalMinutes % 60; }
-    public get deciamlHours(): number { return this.hours + (this.minutes / 60.0); }
+    public get hours() { return Math.floor(this.totalMinutes / 60); }
+    public get minutes() { return this.totalMinutes % 60; }
+    public get deciamlHours() { return this.hours + (this.minutes / 60.0); }
 
     public static subtract(x: Time, y: Time) {
         return new Time(x.totalMinutes - y.totalMinutes);
     }
 
-    public toString(): string { return String(this.hours) + ":" + String(100 + this.minutes).slice(1); }
+    public toString() { return String(this.hours) + ":" + String(100 + this.minutes).slice(1); }
     public static fromString(time: string) {
         var hm = time.split(":");
         return new Time(Number(hm[0]), Number(hm[1]));
     }
 
-    public static fromJSONObject(obj: any): Time {
+    public valueOf() { return this.totalMinutes; }
+
+    public static fromJSONObject(obj: any) {
         return new Time(obj._totalMinutes);
     }
 
@@ -93,5 +95,9 @@ class TimeSpan {
 
     public static equals(x: TimeSpan, y: TimeSpan) {
         return Time.equals(x.begin, y.begin) && Time.equals(x.end, y.end);
+    }
+
+    public valueOf() {
+        return this.begin.totalMinutes * 24 * 60 + this.end.totalMinutes;
     }
 }
