@@ -1,4 +1,6 @@
-﻿/// <reference path="Utilities.ts" />
+﻿/// <reference path="Scripts/typings/knockout/knockout.d.ts" />
+/// <reference path="Scripts/typings/knockout.es5/knockout.es5.d.ts" />
+/// <reference path="Utilities.ts" />
 
 "use strict";
 
@@ -42,6 +44,10 @@ class Time {
     public static fromJSONObject(obj: any): Time {
         return new Time(obj._totalMinutes);
     }
+
+    public static equals(x: Time, y: Time) {
+        return x.totalMinutes === y.totalMinutes;
+    }
 }
 
 class TimeSpan {
@@ -55,17 +61,26 @@ class TimeSpan {
     }
 
     public constructor(public begin: Time, public end: Time) {
-        assert(begin.totalMinutes <= end.totalMinutes);
+        if (begin.totalMinutes > end.totalMinutes) {
+            var tmp = begin;
+            begin = end;
+            end = tmp;
+        }
+
         Object.freeze(this);
     }
 
     public get span(): Time { return Time.subtract(this.end, this.begin); }
 
     public includes(time: Time): boolean {
-        return (this.begin.totalMinutes <= time.totalMinutes) && (time.totalMinutes < this.end.totalMinutes);
+        return (this.begin.totalMinutes <= time.totalMinutes) && (time.totalMinutes <= this.end.totalMinutes);
     }
 
     public static fromJSONObject(obj: any): TimeSpan {
         return new TimeSpan(Time.fromJSONObject(obj._begin), Time.fromJSONObject(obj._end));
+    }
+
+    public static equals(x: TimeSpan, y: TimeSpan) {
+        return Time.equals(x.begin, y.begin) && Time.equals(x.end, y.end);
     }
 }

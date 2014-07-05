@@ -26,10 +26,10 @@ class TaskListViewModel extends BaseViewModel{
     private focusedTask: Task = null;
     private focusedTaskOriginal: Task = null;
     private isTextBoxFocused = false;
-    private timeOptions: Time[] = [];
 
-    private hoge1: Time = null;
-    private hoge2: Time = null;
+    private timeOptions: Time[] = [];
+    private timeSpanBegin: Time = null;
+    private timeSpanEnd: Time = null;
 
     public constructor() {
         super();
@@ -69,6 +69,9 @@ class TaskListViewModel extends BaseViewModel{
     public clear() {
         this.focusedTask = new Task();
         this.focusedTaskOriginal = null;
+        this.timeSpanBegin = this.timeOptions[0];
+        this.timeSpanEnd = this.timeOptions[0];
+
         this.isTextBoxFocused = true;
     }
 
@@ -94,6 +97,10 @@ class TaskListViewModel extends BaseViewModel{
         }
 
         this.isTextBoxFocused = true;
+    }
+
+    private colorCoretimeOptions(option: Element, item: Time) {
+        ko.applyBindingsToNode(option, { "css": (TimeSpan.coretime.includes(item) ? "coretime" : "") }, item);
     }
 
     public get isEditingTask() {

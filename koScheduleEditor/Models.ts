@@ -19,3 +19,7 @@ class Task {
         this.timeSpan = obj.timeSpan;
     }
 }
+
+class TaskCollection {
+    public tasks: Task[] = [];
+}
