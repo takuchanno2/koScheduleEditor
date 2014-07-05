@@ -15,7 +15,7 @@ class BaseViewModel {
         _(Object.getOwnPropertyNames(fn))
             .filter((prop) => (!isAccessor(fn, prop) && _.isFunction(fn[prop])))
             .forEach((prop) => {
-                this[prop] = this[prop].bind(this);
+                (<any>this)[prop] = ((<any>this)[prop]).bind(this);
             });
     }
 }

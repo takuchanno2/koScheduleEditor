@@ -4,7 +4,7 @@ function isAccessor(obj: any, prop: string) {
     return !_.isEmpty(_(Object.getOwnPropertyDescriptor(obj, prop)).pick("set", "get"));
 }
 
-function assert(expr: any, message = null) {
+function assert(expr: any, message: string = null) {
     if (!expr) {
         debugger;
         throw new Error(message || "Assertion Error!");

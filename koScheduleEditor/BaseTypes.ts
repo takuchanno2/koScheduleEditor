@@ -36,7 +36,7 @@ class Time {
     }
 
     public toString(): string { return String(this.hours) + ":" + String(100 + this.minutes).slice(1); }
-    public static fromString(time: string): Time {
+    public static fromString(time: string) {
         var hm = time.split(":");
         return new Time(Number(hm[0]), Number(hm[1]));
     }
@@ -72,11 +72,22 @@ class TimeSpan {
 
     public get span(): Time { return Time.subtract(this.end, this.begin); }
 
-    public includes(time: Time): boolean {
-        return (this.begin.totalMinutes <= time.totalMinutes) && (time.totalMinutes <= this.end.totalMinutes);
+    public includes(time: Time, includeEdges: boolean = true) {
+        if (includeEdges) {
+            return (this.begin.totalMinutes <= time.totalMinutes) && (time.totalMinutes <= this.end.totalMinutes);
+        } else {
+            return (this.begin.totalMinutes < time.totalMinutes) && (time.totalMinutes < this.end.totalMinutes);
+        }
     }
 
-    public static fromJSONObject(obj: any): TimeSpan {
+    public hasOverlap(ts: TimeSpan) {
+        return this.includes(ts.begin, false)
+            || this.includes(ts.end, false)
+            || ts.includes(this.begin, false)
+            || ts.includes(this.end, false);
+    }
+
+    public static fromJSONObject(obj: any) {
         return new TimeSpan(Time.fromJSONObject(obj._begin), Time.fromJSONObject(obj._end));
     }
 
