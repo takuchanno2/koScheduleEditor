@@ -21,15 +21,15 @@
     <table>
       <tr>
         <td><input data-bind="value: focusedTask.name, valueUpdate: 'afterkeydown', hasfocus: isTextBoxFocused, click: $.noop" /></td>
-        <td>ほげ</td>
-        <td>ほげ</td>
+        <td><select data-bind="options: timeOptions, value: hoge1"></select></td>
+        <td><select data-bind="options: timeOptions, value: hoge1"></select></td>
         <td></td>
       </tr>
       <tr>
         <td colspan="4">
           <button type="button" data-bind="enable: (focusedTask.name.length > 0), text: (isEditingTask ? '変更' : '追加'), click: add"></button>
           <button type="button" data-bind="enable: (focusedTask.name.length > 0), click: duplicate">複製</button>
-          <button type="button" data-bind="enable: (isEditingTask || (focusedTask.name.length > 0)), click: cancel">取消</button>
+          <button type="button" data-bind="click: cancel">取消</button>
         </td>
       </tr>
     </table>

@@ -20,37 +20,25 @@ class BaseViewModel {
     }
 }
 
-class TaskViewModel extends BaseViewModel{
-    public constructor(private model: Task = new Task()) {
-        super();
-        ko.track(this);
-    }
-
-    public get name() { return this.model.name; }
-    public set name(value: string) { this.model.name = value; }
-
-    public get timeSpan() { return this.model.timeSpan; }
-    public set timeSpan(value: TimeSpan) { this.model.timeSpan = value;  }
-
-    public clone(): TaskViewModel {
-        return new TaskViewModel(this.model.clone());
-    }
-
-    public copyFrom(task: TaskViewModel) {
-        this.model.copyFrom(task.model);
-    }
-}
-
 class TaskListViewModel extends BaseViewModel{
-    public tasks: TaskViewModel[] = [];
+    public tasks: Task[] = [];
 
-    private focusedTask: TaskViewModel;
-    private focusedTaskOriginal: TaskViewModel;
+    private focusedTask: Task = null;
+    private focusedTaskOriginal: Task = null;
     private isTextBoxFocused = false;
+    private timeOptions: Time[] = [];
+
+    private hoge1: Time = null;
+    private hoge2: Time = null;
 
     public constructor() {
         super();
         this.clear();
+
+        for (var i = 0; i <= 24 * 60; i += Time.unitMinutes) {
+            this.timeOptions.push(new Time(i));
+        }
+
         ko.track(this);
     }
 
@@ -79,21 +67,21 @@ class TaskListViewModel extends BaseViewModel{
     }
 
     public clear() {
-        this.focusedTask = new TaskViewModel();
+        this.focusedTask = new Task();
         this.focusedTaskOriginal = null;
         this.isTextBoxFocused = true;
     }
 
-    public remove(task: TaskViewModel) {
+    public remove(task: Task) {
         if (task === this.focusedTask) {
             this.clear();
         }
 
         this.tasks.remove(task);
-       this.isTextBoxFocused = true;
+        this.isTextBoxFocused = true;
     }
 
-    public focus(task: TaskViewModel) {
+    public focus(task: Task) {
         if (task) {
             if (task !== this.focusedTask) {
                 this.focusedTask = task;

@@ -4,6 +4,7 @@
 
 class Time {
     public static unitMinutes = 30;
+    public static zero = new Time(0);
 
     public totalMinutes: number;
 
@@ -44,6 +45,8 @@ class Time {
 }
 
 class TimeSpan {
+    public static zero = new TimeSpan(Time.zero, Time.zero);
+
     // public static coretime: TimeSpan = null;
     public static coretime = new TimeSpan(new Time(9, 0), new Time(17, 0));
 
@@ -52,7 +55,7 @@ class TimeSpan {
     }
 
     public constructor(public begin: Time, public end: Time) {
-        assert(begin.totalMinutes < end.totalMinutes);
+        assert(begin.totalMinutes <= end.totalMinutes);
         Object.freeze(this);
     }
 

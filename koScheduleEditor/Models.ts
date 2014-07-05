@@ -5,7 +5,7 @@
 class Task {
     public constructor(
         public name = "",
-        public timeSpan = null
+        public timeSpan = TimeSpan.zero
         ) {
         ko.track(this);
     }
