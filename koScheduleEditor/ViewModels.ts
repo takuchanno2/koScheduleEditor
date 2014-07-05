@@ -20,7 +20,7 @@ class BaseViewModel {
     }
 }
 
-class TaskListViewModel extends BaseViewModel{
+class TaskCollectionViewModel extends BaseViewModel{
     public tasks: TaskCollection = new TaskCollection();
 
     private focusedTask: Task = null;
@@ -32,7 +32,6 @@ class TaskListViewModel extends BaseViewModel{
 
     private timeSpanBegin: Time = null;
     private timeSpanEnd: Time = null;
-    private timeSpanSubscriptions: KnockoutSubscription[] = [];
 
     public constructor() {
         super();
@@ -45,32 +44,12 @@ class TaskListViewModel extends BaseViewModel{
             this.timeOptions.push(time);
         }
 
-        ko.track(this);
         this.clear();
+        this.updateTaskTimeSpan();
 
-        this.onTimeSpanChanged();
-        this.registerTimeSpanSubscriptions();
-    }
-
-    private modifyTimeSpanSneakily(func: () => void) {
-        this.unregisterTimeSpanSubscriptions();
-        func();
-        this.registerTimeSpanSubscriptions();
-        this.onTimeSpanChanged();
-    }
-
-    private registerTimeSpanSubscriptions() {
-        ["timeSpanBegin", "timeSpanEnd"].forEach((prop) => {
-            this.timeSpanSubscriptions.push(ko.getObservable(this, prop).subscribe(this.onTimeSpanChanged));
-        });
-    }
-
-    private unregisterTimeSpanSubscriptions() {
-        this.timeSpanSubscriptions.forEach((s) => {
-            s.dispose();
-        });
-
-        this.timeSpanSubscriptions = [];
+        ko.track(this);
+        ko.getObservable(this, "timeSpanBegin").subscribe(this.onTimeSpanBeginChanged);
+        ko.getObservable(this, "timeSpanEnd").subscribe(this.onTimeSpanEndChanged);
     }
 
     public add() {
@@ -101,10 +80,8 @@ class TaskListViewModel extends BaseViewModel{
     public clear() {
         this.focusedTask = new Task();
         this.focusedTaskOriginal = null;
-        this.modifyTimeSpanSneakily(() => {
-            this.timeSpanBegin = this.intialTimeSpanOption;
-            this.timeSpanEnd = this.intialTimeSpanOption;
-        });
+        this.timeSpanBegin = this.intialTimeSpanOption;
+        this.timeSpanEnd = this.intialTimeSpanOption;
 
         this.isTextBoxFocused = true;
     }
@@ -123,11 +100,8 @@ class TaskListViewModel extends BaseViewModel{
             if (task !== this.focusedTask) {
                 this.focusedTask = task;
                 this.focusedTaskOriginal = task.clone();
-
-                this.modifyTimeSpanSneakily(() => {
-                    this.timeSpanBegin = task.timeSpan.begin;
-                    this.timeSpanEnd = task.timeSpan.end;
-                });
+                this.timeSpanBegin = task.timeSpan.begin;
+                this.timeSpanEnd = task.timeSpan.end;
             }
         } else {
             if (this.isEditingTask) {
@@ -142,25 +116,27 @@ class TaskListViewModel extends BaseViewModel{
         ko.applyBindingsToNode(option, { "css": (TimeSpan.coretime.includes(item) ? "coretime" : "") }, item);
     }
 
-    private onTimeSpanChanged() {
-        if (!this.timeSpanBegin || !this.timeSpanEnd) return;
+    private onTimeSpanBeginChanged() {
+        if (this.timeSpanBegin.totalMinutes > this.timeSpanEnd.totalMinutes) {
+            this.timeSpanEnd = this.timeSpanBegin;  
+        }
+        this.updateTaskTimeSpan();
+    }
 
-        if (this.timeSpanBegin.totalMinutes <= this.timeSpanEnd.totalMinutes) {
-            var newTimeSpan = new TimeSpan(this.timeSpanBegin, this.timeSpanEnd);
-            if (!TimeSpan.equals(this.focusedTask.timeSpan, newTimeSpan)) {
-                this.focusedTask.timeSpan = newTimeSpan;
-                if (this.isEditingTask) {
-                    this.tasks.updateIndex(this.focusedTask);
-                }
+    private onTimeSpanEndChanged() {
+        if (this.timeSpanBegin.totalMinutes > this.timeSpanEnd.totalMinutes) {
+            this.timeSpanBegin = this.timeSpanEnd;
+        }
+        this.updateTaskTimeSpan();
+    }
+
+    private updateTaskTimeSpan() {
+        var newTimeSpan = new TimeSpan(this.timeSpanBegin, this.timeSpanEnd);
+        if (!TimeSpan.equals(this.focusedTask.timeSpan, newTimeSpan)) {
+            this.focusedTask.timeSpan = newTimeSpan;
+            if (this.isEditingTask) {
+                this.tasks.updateIndex(this.focusedTask);
             }
-        } else {
-            _.defer(() => {
-                this.modifyTimeSpanSneakily(() => {
-                    var begin = this.timeSpanBegin;
-                    this.timeSpanBegin = this.timeSpanEnd;
-                    this.timeSpanEnd = begin;
-                });
-            });
         }
     }
 
