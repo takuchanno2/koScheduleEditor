@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <title>ko Schedule Editor</title>
+  <link rel="stylesheet" href="Content/bootstrap.min.css" type="text/css" />
   <link rel="stylesheet" href="app.css" type="text/css" />
   <script src="Scripts/jquery-2.1.1.min.js"></script>
   <script src="Scripts/bootstrap.min.js"></script>
@@ -38,6 +39,7 @@
   <table>
     <thead>
       <tr>
+        <td></td>
         <td>タスク名</td>
         <td>開始</td>
         <td>終了</td>
@@ -45,7 +47,8 @@
       </tr>
     </thead>
     <tbody data-bind="foreach: tasks">
-      <tr class="task" data-bind="css: { invalid: !isValid, focused: ($data === $parent.focusedTask) }, click: $parent.focus">
+      <tr class="task" data-bind="css: { focused: ($data === $parent.focusedTask) }, click: $parent.focus">
+        <td><span class="glyphicon glyphicon-exclamation-sign invalid" data-bind="visible: !valid"></span></td>
         <td class="task-name"><a href="#" data-bind="text: name"></a></td>
         <td data-bind="text: timeSpan.begin"></td>
         <td data-bind="text: timeSpan.end"></td>

@@ -35,7 +35,7 @@ class TaskViewModel extends BaseViewModel {
     public get timeSpan() { return this.task.timeSpan; }
     public set timeSpan(value: TimeSpan) { this.task.timeSpan = value; } 
 
-    public get isValid() {
+    public get valid() {
         return !this.hasTimeSpanOverlap && this.timeSpan.span.totalMinutes > 0;
     }
 
