@@ -190,20 +190,23 @@ class TaskListViewModel extends BaseViewModel {
         }
     }
 
-    // もう少しどうにかできないか
+    // もう少しどうにかできないか。O(n^2)はダサ過ぎる
     private validateTask() {
         if (!_.isEmpty(this.tasks)) {
-            this.tasks[0].hasTimeSpanOverlap = false;
+            var first = this.tasks[0];
+            first.hasTimeSpanOverlap = false;
         }
 
-        for (var i = 1; i < this.tasks.length; i++) {
-            var prev = this.tasks[i - 1];
-            var curr = this.tasks[i];
-            if (prev.timeSpan.hasOverlap(curr.timeSpan)) {
-                prev.hasTimeSpanOverlap = true;
-                curr.hasTimeSpanOverlap = true;
-            } else {
-                curr.hasTimeSpanOverlap = false;
+        this.tasks.forEach((t) => { t.hasTimeSpanOverlap = false; });
+
+        for (var i = 0; i < this.tasks.length; i++) {
+            var ti = this.tasks[i];
+            for (var j = i + 1; j < this.tasks.length; j++) {
+                var tj = this.tasks[j];
+                if (ti.timeSpan.hasOverlap(tj.timeSpan)) {
+                    ti.hasTimeSpanOverlap = true;
+                    tj.hasTimeSpanOverlap = true;
+                }
             }
         }
     }
