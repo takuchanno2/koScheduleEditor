@@ -190,29 +190,26 @@ class TaskListViewModel extends BaseViewModel {
         }
     }
 
-    // もう少しどうにかできないか。O(n^2)はダサ過ぎる
     private validateTask() {
         this.tasks.forEach((t) => { t.hasTimeSpanOverlap = false; });
         if (this.tasks.length < 2) return;
 
-        var queue = [this.tasks[0]]; // task.endで昇順ソート
-        for (var i = 1; i < this.tasks.length; i++) {
-            var curr = this.tasks[i];
-
-            while (!_.isEmpty(queue) && queue[0].task.timeSpan.end <= curr.timeSpan.begin) {
+        var queue = [_.first(this.tasks)]; // task.endで昇順ソート
+        _(this.tasks).rest(1).forEach((task) => {
+            while (!_.isEmpty(queue) && _.first(queue).task.timeSpan.end <= task.timeSpan.begin) {
                 queue.shift();
             }
 
-            queue.forEach((t) => {
-                if (curr.timeSpan.hasOverlap(t.timeSpan)) {
-                    curr.hasTimeSpanOverlap = true;
-                    t.hasTimeSpanOverlap = true;
+            queue.forEach((qtask) => {
+                if (task.timeSpan.hasOverlap(qtask.timeSpan)) {
+                    task.hasTimeSpanOverlap = true;
+                    qtask.hasTimeSpanOverlap = true;
                 }
             });
 
-            var idx = _.sortedIndex(queue, curr, (t) => t.timeSpan.end.totalMinutes);
-            queue.splice(idx, 0, curr);
-        }
+            var idx = _.sortedIndex(queue, task, (t) => t.timeSpan.end.totalMinutes);
+            queue.splice(idx, 0, task);
+        });
     }
 
     private updateIndex(taskvm: TaskViewModel) {
