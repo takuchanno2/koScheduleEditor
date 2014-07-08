@@ -192,25 +192,28 @@ class TaskListViewModel extends BaseViewModel {
 
     // もう少しどうにかできないか。O(n^2)はダサ過ぎる
     private validateTask() {
-        if (!_.isEmpty(this.tasks)) {
-            var first = this.tasks[0];
-            first.hasTimeSpanOverlap = false;
-        }
-
         this.tasks.forEach((t) => { t.hasTimeSpanOverlap = false; });
+        if (this.tasks.length < 2) return;
 
-        for (var i = 0; i < this.tasks.length; i++) {
-            var ti = this.tasks[i];
-            for (var j = i + 1; j < this.tasks.length; j++) {
-                var tj = this.tasks[j];
-                if (ti.timeSpan.hasOverlap(tj.timeSpan)) {
-                    ti.hasTimeSpanOverlap = true;
-                    tj.hasTimeSpanOverlap = true;
-                }
+        var queue = [this.tasks[0]]; // task.endで昇順ソート
+        for (var i = 1; i < this.tasks.length; i++) {
+            var curr = this.tasks[i];
+
+            while (!_.isEmpty(queue) && queue[0].task.timeSpan.end <= curr.timeSpan.begin) {
+                queue.shift();
             }
+
+            queue.forEach((t) => {
+                if (curr.timeSpan.hasOverlap(t.timeSpan)) {
+                    curr.hasTimeSpanOverlap = true;
+                    t.hasTimeSpanOverlap = true;
+                }
+            });
+
+            var idx = _.sortedIndex(queue, curr, (t) => t.timeSpan.end.totalMinutes);
+            queue.splice(idx, 0, curr);
         }
     }
-
 
     private updateIndex(taskvm: TaskViewModel) {
         if (this.tasks.length > 1) {
